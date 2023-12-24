@@ -28,7 +28,6 @@ ifstream open_file(const string& file_name)
 long int read_line_numbers(ifstream& file)
 {
 	long int line_count = 0;
-
 	// Read the file line by line
 	std::string line;
 	while (getline(file, line)) {
