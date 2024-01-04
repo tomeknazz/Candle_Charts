@@ -13,6 +13,77 @@ struct stock_data {
 	double volume;
 };
 
+void clear_screen()
+{
+#ifdef _WIN32
+	system("cls");
+#else
+	system("cls")
+#endif
+
+
+}
+
+void exit_program(stock_data* stock_data_list)
+{
+	clear_screen();
+	delete[] stock_data_list;
+	exit(0);
+}
+
+void menu(stock_data *stock_data_list);
+
+ifstream open_file(const string& file_name);
+
+long int read_line_numbers(ifstream& file);
+
+void read_csv_to_struct(stock_data*& data, const string& file_name);
+
+void generate_chart(stock_data* stock_data_list);
+
+
+
+int main() {
+	stock_data* stock_data_list = nullptr;
+
+	menu(stock_data_list);
+
+
+	return 0;
+}
+
+void menu(stock_data* stock_data_list)
+{
+	clear_screen();
+	cout <<
+		" _____                 _ _      _____ _                _       \n"
+		"/  __ \\               | | |    /  __ \\ |              | |      \n"
+		"| /  \\/ __ _ _ __   __| | | ___| /  \\/ |__   __ _ _ __| |_ ___ \n"
+		"| |    / _` | '_ \\ / _` | |/ _ \\ |   | '_ \\ / _` | '__| __/ __|\n"
+		"| \\__/\\ (_| | | | | (_| | |  __/ \\__/\\ | | | (_| | |  | |\\__ \\ \n"
+		" \\____/\\__,_|_| |_|\\__,_|_|\\___|\\____/_| |_|\\__,_|_|   \\__|___/\n"
+		"		  Tomasz Nazar            197613            ACiR3                    \n";
+
+	cout << "g. Generate chart" << endl;
+	cout << "q. Exit" << endl;
+	char choice;
+	cin >> choice;
+	if (choice == 'g')
+	{
+		generate_chart(stock_data_list);
+	}
+	else if (choice == 'q')
+	{
+		cout << "Exiting..." << endl;
+		exit_program(stock_data_list);
+	}
+	else
+	{
+		cout << "Wrong choice!" << endl;
+		menu(stock_data_list);
+	}
+}
+
 ifstream open_file(const string& file_name)
 {
 	// Open the file
@@ -29,14 +100,14 @@ long int read_line_numbers(ifstream& file)
 {
 	long int line_count = 0;
 	// Read the file line by line
-	std::string line;
+	string line;
 	while (getline(file, line)) {
 		++line_count;
 	}
 
 	// Reset the file position
 	file.clear();
-	file.seekg(0, std::ios::beg);
+	file.seekg(0, ios::beg);
 
 	return line_count;
 }
@@ -53,21 +124,21 @@ void read_csv_to_struct(stock_data*& data, const string& file_name)
 
 	// Read the file line by line
 	for (int count = 0; count < line_count; ++count) {
-		std::string line;
+		string line;
 		getline(file, line);
-		std::istringstream iss(line);
+		istringstream iss(line);
 
 		// Read each column from the line
 		if (iss.getline(data[count].date, sizeof(data[count].date), ',') &&
-			getline(iss, line, ',') && (std::istringstream(line) >> data[count].open) &&
-			getline(iss, line, ',') && (std::istringstream(line) >> data[count].high) &&
-			getline(iss, line, ',') && (std::istringstream(line) >> data[count].low) &&
-			getline(iss, line, ',') && (std::istringstream(line) >> data[count].close) &&
-			getline(iss, line, ',') && (std::istringstream(line) >> data[count].volume)) {
+			getline(iss, line, ',') && (istringstream(line) >> data[count].open) &&
+			getline(iss, line, ',') && (istringstream(line) >> data[count].high) &&
+			getline(iss, line, ',') && (istringstream(line) >> data[count].low) &&
+			getline(iss, line, ',') && (istringstream(line) >> data[count].close) &&
+			getline(iss, line, ',') && (istringstream(line) >> data[count].volume)) {
 			// Data successfully read
 		}
 		else {
-			std::cerr << "Error parsing line: " << line << std::endl;
+			cerr << "Error parsing line: " << line << endl;
 		}
 	}
 
@@ -75,28 +146,31 @@ void read_csv_to_struct(stock_data*& data, const string& file_name)
 	file.close();
 }
 
-void print_stock_data(stock_data* data, long int line_count)
+void generate_chart(stock_data *stock_data_list)
 {
-
-	for (int i = 0; i < line_count - 1; ++i)
+	clear_screen();
+	int choice;
+	cout << "1. Generate default chart" << endl;
+	cout << "2. Choose your own csv file" << endl;
+	cin >> choice;
+	if (choice == 1)
 	{
-		cout << "Date: " << data[i].date << ", Open: " << data[i].open
-			<< ", High: " << data[i].high << ", Low: " << data[i].low
-			<< ", Close: " << data[i].close << endl;
+		read_csv_to_struct(stock_data_list, "intc_us_data.csv");
 	}
-}
-
-int main() {
-	string file_name;
-	cout << "Enter the file name: ";
-	cin >> file_name;
-	ifstream file = open_file(file_name);
-	// Create an array to store StockData
-	stock_data* stock_data_list = nullptr;
-	read_csv_to_struct(stock_data_list, file_name);
-	print_stock_data(stock_data_list, read_line_numbers(file));
-
-
-	delete[] stock_data_list;
-	return 0;
+	else if (choice == 2)
+	{
+		string file_name;
+		cout << "Enter the file name: ";
+		cin >> file_name;
+		cout << "Generating chart..." << endl;
+		read_csv_to_struct(stock_data_list, file_name);
+	}
+	else
+	{
+		cout << "Wrong choice!" << endl;
+		generate_chart(stock_data_list);
+	}
+	
+	
+	
 }
