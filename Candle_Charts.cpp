@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -20,8 +21,6 @@ void clear_screen()
 #else
 	system("cls")
 #endif
-
-
 }
 
 void exit_program(stock_data* stock_data_list)
@@ -31,24 +30,19 @@ void exit_program(stock_data* stock_data_list)
 	exit(0);
 }
 
-void menu(stock_data *stock_data_list);
+void menu(stock_data* stock_data_list);
 
 ifstream open_file(const string& file_name);
 
 long int read_line_numbers(ifstream& file);
 
-void read_csv_to_struct(stock_data*& data, const string& file_name);
+long int read_csv_to_struct(stock_data*& data, const string& file_name);
 
-void generate_chart(stock_data* stock_data_list);
-
-
+void generate_chart(stock_data* stock_data_list, long int size, int height, int max_records);
 
 int main() {
 	stock_data* stock_data_list = nullptr;
-
 	menu(stock_data_list);
-
-
 	return 0;
 }
 
@@ -70,7 +64,29 @@ void menu(stock_data* stock_data_list)
 	cin >> choice;
 	if (choice == 'g')
 	{
-		generate_chart(stock_data_list);
+		int choice1;
+		cout << "1. Generate default chart" << endl;
+		cout << "2. Choose your own csv file" << endl;
+		cin >> choice1;
+		if (choice1 == 1)
+		{
+			long int size = read_csv_to_struct(stock_data_list, "intc_us_data.csv");
+			generate_chart(stock_data_list, size, 50, 200);
+		}
+		else if (choice1 == 2)
+		{
+			string file_name;
+			cout << "Enter the file name: ";
+			cin >> file_name;
+			cout << "Generating chart..." << endl;
+			long int size = read_csv_to_struct(stock_data_list, file_name);
+			generate_chart(stock_data_list, size, 50, 200);
+		}
+		else
+		{
+			cout << "Wrong choice!" << endl;
+			//generate_chart(stock_data_list);
+		}
 	}
 	else if (choice == 'q')
 	{
@@ -112,7 +128,7 @@ long int read_line_numbers(ifstream& file)
 	return line_count;
 }
 
-void read_csv_to_struct(stock_data*& data, const string& file_name)
+long int read_csv_to_struct(stock_data*& data, const string& file_name)
 {
 	// Open the CSV file
 	ifstream file = open_file(file_name);
@@ -135,42 +151,53 @@ void read_csv_to_struct(stock_data*& data, const string& file_name)
 			getline(iss, line, ',') && (istringstream(line) >> data[count].low) &&
 			getline(iss, line, ',') && (istringstream(line) >> data[count].close) &&
 			getline(iss, line, ',') && (istringstream(line) >> data[count].volume)) {
-			// Data successfully read
-		}
-		else {
-			cerr << "Error parsing line: " << line << endl;
 		}
 	}
 
 	// Close the file
 	file.close();
+
+	return line_count;
 }
 
-void generate_chart(stock_data *stock_data_list)
+double get_max(stock_data* stock_data_list, long int size)
 {
-	clear_screen();
-	int choice;
-	cout << "1. Generate default chart" << endl;
-	cout << "2. Choose your own csv file" << endl;
-	cin >> choice;
-	if (choice == 1)
+	double max = 0; // Initialize max to negative infinity
+	for (int i = size - 200; i < size; i++)
 	{
-		read_csv_to_struct(stock_data_list, "intc_us_data.csv");
+		if (stock_data_list[i].high > max)
+		{
+			max = stock_data_list[i].high;
+		}
 	}
-	else if (choice == 2)
+	return max;
+}
+
+double get_min(stock_data* stock_data_list, long int size)
+{
+	double min = 1000000; // Initialize min to positive infinity
+	for (int i = size - 200; i < size; i++)
 	{
-		string file_name;
-		cout << "Enter the file name: ";
-		cin >> file_name;
-		cout << "Generating chart..." << endl;
-		read_csv_to_struct(stock_data_list, file_name);
+		if (stock_data_list[i].low < min and stock_data_list[i].low>0)
+		{
+			min = stock_data_list[i].low;
+		}
 	}
-	else
-	{
-		cout << "Wrong choice!" << endl;
-		generate_chart(stock_data_list);
-	}
-	
-	
-	
+	return min;
+}
+
+void generate_chart(stock_data* stock_data_list, long int size, int height, int max_records)
+{
+
+	cout << get_max(stock_data_list, size) << endl;
+	cout << get_min(stock_data_list, size) << endl;
+	double scale = (get_max(stock_data_list, size) - get_min(stock_data_list, size)) / height;
+	cout << scale << endl;
+	//check if something is max-(scale/2) if yes draw | if not draw space
+	//then check if its body or shadow
+
+
+
+
+
 }
