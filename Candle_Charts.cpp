@@ -26,6 +26,7 @@ void clear_screen()
 void exit_program(stock_data* stock_data_list)
 {
 	clear_screen();
+	cout << "\033[33m" << "Thank you for using my program! Goodbye!" << "\033[0m" << endl;
 	delete[] stock_data_list;
 	exit(0);
 }
@@ -46,7 +47,7 @@ int main() {
 	return 0;
 }
 
-void menu(stock_data* stock_data_list)
+void ascii_art_welcome()
 {
 	clear_screen();
 	cout <<
@@ -56,37 +57,54 @@ void menu(stock_data* stock_data_list)
 		"| |    / _` | '_ \\ / _` | |/ _ \\ |   | '_ \\ / _` | '__| __/ __|\n"
 		"| \\__/\\ (_| | | | | (_| | |  __/ \\__/\\ | | | (_| | |  | |\\__ \\ \n"
 		" \\____/\\__,_|_| |_|\\__,_|_|\\___|\\____/_| |_|\\__,_|_|   \\__|___/\n"
-		"		  Tomasz Nazar            197613            ACiR3                    \n";
+		"	Tomasz Nazar            197613            ACiR3                    \n";
 
+	cout << "\033[33m" << "Choose an option:" << "\033[0m" << endl;;
 	cout << "g. Generate chart" << endl;
 	cout << "q. Exit" << endl;
+}
+
+void menu(stock_data* stock_data_list)
+{
+
+	ascii_art_welcome();
 	char choice;
 	cin >> choice;
+	while (choice != 'g' and choice != 'q')
+	{
+		cout << "Enter correct option" << endl;
+		cin >> choice;
+	}
 	if (choice == 'g')
 	{
-		int choice1;
+		char choice1;
+		clear_screen();
+		cout << "\033[33m" << "Choose an option:" << "\033[0m" << endl;;
 		cout << "1. Generate default chart" << endl;
 		cout << "2. Choose your own csv file" << endl;
+		
 		cin >> choice1;
-		if (choice1 == 1)
+		while (choice1 != '1' and choice1 != '2')
+		{
+
+			cout << "Enter correct option" << endl;
+			cin >> choice1;
+		}
+		if (choice1 == '1')
 		{
 			long int size = read_csv_to_struct(stock_data_list, "intc_us_data.csv");
 			generate_chart(stock_data_list, size, 50, 200);
 		}
-		else if (choice1 == 2)
+		else if (choice1 == '2')
 		{
 			string file_name;
 			cout << "Enter the file name: ";
 			cin >> file_name;
 			cout << "Generating chart..." << endl;
-			long int size = read_csv_to_struct(stock_data_list, file_name);
+			const long int size = read_csv_to_struct(stock_data_list, file_name);
 			generate_chart(stock_data_list, size, 50, 200);
 		}
-		else
-		{
-			cout << "Wrong choice!" << endl;
-			//generate_chart(stock_data_list);
-		}
+
 	}
 	else if (choice == 'q')
 	{
