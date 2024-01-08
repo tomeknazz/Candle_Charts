@@ -97,8 +97,8 @@ void menu(stock_data* stock_data_list)
 		{
 			cout << endl << endl << endl;
 			long int size = read_csv_to_struct(stock_data_list, "intc_us_data.csv");
-			generate_chart_to_file(stock_data_list, size, 50, 200, "chart.txt");
-			generate_chart(stock_data_list, size, 50, 200);
+			generate_chart_to_file(stock_data_list, size, 100, 1000, "chart.txt");
+			generate_chart(stock_data_list, size, 80, 200);
 			cout << endl << endl;
 			exit_program(stock_data_list);
 
@@ -111,7 +111,7 @@ void menu(stock_data* stock_data_list)
 			cout << "Generating chart..." << endl;
 			const long int size = read_csv_to_struct(stock_data_list, file_name);
 			generate_chart(stock_data_list, size, 50, 200);
-			generate_chart_to_file(stock_data_list, size, 50, 200, "chart.txt");
+			generate_chart_to_file(stock_data_list, size, 100, 1000, "chart.txt");
 			cout << endl << endl;
 			exit_program(stock_data_list);
 		}
@@ -188,10 +188,10 @@ long int read_csv_to_struct(stock_data*& data, const string& file_name)
 	return line_count;
 }
 
-double get_max(const stock_data* stock_data_list, long int size)
+double get_max(const stock_data* stock_data_list, long int size, int records)
 {
 	double max = 0; // Initialize max to negative infinity
-	for (int i = size - 200; i < size; i++)
+	for (int i = size - records; i < size; i++)
 	{
 		if (stock_data_list[i].high > max)
 		{
@@ -201,10 +201,10 @@ double get_max(const stock_data* stock_data_list, long int size)
 	return max;
 }
 
-double get_min(const stock_data* stock_data_list, long int size)
+double get_min(const stock_data* stock_data_list, long int size, int records)
 {
 	double min = 1000000; // Initialize min to positive infinity
-	for (int i = size - 200; i < size; i++)
+	for (int i = size - records; i < size; i++)
 	{
 		if (stock_data_list[i].low < min and stock_data_list[i].low>0)
 		{
@@ -247,8 +247,8 @@ double get_min(const stock_data* stock_data_list, long int size)
 //}
 
 void generate_chart(const stock_data* stock_data_list, long int size, int height, int records) {
-	const double max = get_max(stock_data_list, size);
-	const double min = get_min(stock_data_list, size);
+	const double max = get_max(stock_data_list, size, records);
+	const double min = get_min(stock_data_list, size, records);
 	const double scale = (max - min) / height;
 
 	for (int i = 0; i < height; i++) {
@@ -278,8 +278,8 @@ void generate_chart(const stock_data* stock_data_list, long int size, int height
 }
 
 void generate_chart_to_file(const stock_data* stock_data_list, long int size, int height, int records, const string& filename) {
-	const double max = get_max(stock_data_list, size);
-	const double min = get_min(stock_data_list, size);
+	const double max = get_max(stock_data_list, size,records);
+	const double min = get_min(stock_data_list, size,records);
 	const double scale = (max - min) / height;
 
 	ofstream outputFile(filename); // Open the output file stream
