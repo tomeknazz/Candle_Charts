@@ -39,8 +39,6 @@ long int read_csv_to_struct(stock_data*& data, const string& file_name);
 
 void generate_chart(const stock_data* stock_data_list, long int size, int height, int records);
 
-//void generate_chart1(const stock_data* stock_data_list, long int size, int height, int records);
-
 void generate_chart_to_file(const stock_data* stock_data_list, long int size, int height, int records, const string& filename);
 
 void displayFileContents(const char* filename);
@@ -84,8 +82,8 @@ void menu(stock_data* stock_data_list)
 		char choice1;
 		clear_screen();
 		cout << "\033[33m" << "Choose an option:" << "\033[0m" << endl;;
-		cout << "1. Generate default chart (height: 50 ;width: 200)" << endl;
-		cout << "2. Choose your own csv file" << endl;
+		cout << "1. Generate default chart (height: 50 ;width: 200) >> intc_us_data.csv >> chart.txt" << endl;
+		cout << "2. Choose your own csv file and parameters" << endl;
 
 		cin >> choice1;
 		while (choice1 != '1' and choice1 != '2')
@@ -97,22 +95,30 @@ void menu(stock_data* stock_data_list)
 		{
 			cout << endl << endl << endl;
 			long int size = read_csv_to_struct(stock_data_list, "intc_us_data.csv");
-			generate_chart_to_file(stock_data_list, size, 100, 1000, "chart.txt");
-			generate_chart(stock_data_list, size, 80, 200);
+			generate_chart_to_file(stock_data_list, size, 50, 200, "chart.txt");
+			generate_chart(stock_data_list, size, 50, 200);
 			cout << endl << endl;
 			exit_program(stock_data_list);
 
 		}
 		else if (choice1 == '2')
 		{
-			string file_name;
-			cout << "Enter the file name: ";
-			cin >> file_name;
-			cout << "Generating chart..." << endl;
-			const long int size = read_csv_to_struct(stock_data_list, file_name);
-			generate_chart(stock_data_list, size, 50, 200);
-			generate_chart_to_file(stock_data_list, size, 100, 1000, "chart.txt");
-			cout << endl << endl;
+			string input_file_name, output_file_name;
+			int height, width;
+			cout << "Enter the csv file name: ";
+			cin >> input_file_name;
+			cout << "Enter the output file name: ";
+			cin >> output_file_name;
+			cout << "Enter desired height: ";
+			cin >> height;
+			cout << "Enter desired width: ";
+			cin >> width;
+			clear_screen();
+			cout<< "Generating chart from file: " << input_file_name << " to file: " << output_file_name << " with height: " << height << " and width: " << width << endl;
+			const long int size = read_csv_to_struct(stock_data_list, input_file_name);
+			generate_chart(stock_data_list, size, height, width);
+			generate_chart_to_file(stock_data_list, size, height, width, output_file_name);
+			
 			exit_program(stock_data_list);
 		}
 	}
@@ -213,38 +219,6 @@ double get_min(const stock_data* stock_data_list, long int size, int records)
 	}
 	return min;
 }
-
-//Deprecated
-//void generate_chart1(const stock_data* stock_data_list, long int size, int height, int records) {
-//	const double max = get_max(stock_data_list, size);
-//	const double min = get_min(stock_data_list, size);
-//	const double scale = (max - min) / height;
-//
-//	for (int i = 0; i < height; i++)
-//	{
-//		for (int j = size - records; j < size; j++)
-//		{
-//			const double point = max - scale / 2 - scale * i;
-//			if ((stock_data_list[j].high >= point and (point > stock_data_list[j].open and point > stock_data_list[j].close)) or (stock_data_list[j].low <= point and point < stock_data_list[j].close and point < stock_data_list[j].open))
-//			{
-//				cout << "|";
-//			}
-//			else if (stock_data_list[j].close - stock_data_list[j].open > 0 and point < stock_data_list[j].close and point > stock_data_list[j].open)
-//			{
-//				cout << "O";
-//			}
-//			else if (stock_data_list[j].close - stock_data_list[j].open < 0 and point < stock_data_list[j].open and point > stock_data_list[j].close)
-//			{
-//				cout << "#";
-//			}
-//			else
-//			{
-//				cout << " ";
-//			}
-//		}
-//		cout << endl;
-//	}
-//}
 
 void generate_chart(const stock_data* stock_data_list, long int size, int height, int records) {
 	const double max = get_max(stock_data_list, size, records);
