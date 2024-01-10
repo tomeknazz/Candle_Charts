@@ -5,7 +5,8 @@
 
 using namespace std;
 
-struct stock_data {
+struct stock_data
+{
 	char date[11];
 	double open;
 	double high;
@@ -22,6 +23,8 @@ void clear_screen()
 	system("cls")
 #endif
 }
+
+void ascii_art_welcome();
 
 void exit_program(const stock_data* stock_data_list)
 {
@@ -42,10 +45,12 @@ void generate_chart(const stock_data* stock_data_list, long int size, int height
 
 void generate_chart_to_file(const stock_data* stock_data_list, long int size, int height, int records, const string& filename);
 
-void displayFileContents(const char* filename);
+double get_max(const stock_data* stock_data_list, long int size, int records);
 
-int main() {
+double get_min(const stock_data* stock_data_list, long int size, int records);
 
+int main()
+{
 	stock_data* stock_data_list = nullptr;
 	menu(stock_data_list);
 	return 0;
@@ -63,7 +68,7 @@ void ascii_art_welcome()
 		" \\____/\\__,_|_| |_|\\__,_|_|\\___|\\____/_| |_|\\__,_|_|   \\__|___/\n"
 		"	Tomasz Nazar            197613            ACiR3                    \n";
 
-	cout << "\033[33m" << "Choose an option:" << "\033[0m" << endl;;
+	cout << "\033[33m" << "Choose an option:" << "\033[0m" << endl;
 	cout << "g. Generate chart" << endl;
 	cout << "q. Exit" << endl;
 }
@@ -82,7 +87,7 @@ void menu(stock_data* stock_data_list)
 	{
 		char choice1;
 		clear_screen();
-		cout << "\033[33m" << "Choose an option:" << "\033[0m" << endl;;
+		cout << "\033[33m" << "Choose an option:" << "\033[0m" << endl;
 		cout << "1. Generate default chart (height: 50 ;width: 200) >> intc_us_data.csv >> chart.txt" << endl;
 		cout << "2. Choose your own csv file and parameters" << endl;
 
@@ -95,12 +100,11 @@ void menu(stock_data* stock_data_list)
 		if (choice1 == '1')
 		{
 			cout << endl << endl << endl;
-			long int size = read_csv_to_struct(stock_data_list, "intc_us_data.csv");
+			const long int size = read_csv_to_struct(stock_data_list, "intc_us_data.csv");
 			generate_chart_to_file(stock_data_list, size, 50, 200, "chart.txt");
 			generate_chart(stock_data_list, size, 50, 200);
 			cout << endl << endl;
 			exit_program(stock_data_list);
-
 		}
 		else if (choice1 == '2')
 		{
@@ -115,7 +119,8 @@ void menu(stock_data* stock_data_list)
 			cout << "Enter desired width: ";
 			cin >> width;
 			clear_screen();
-			cout << "Generating chart from file: " << input_file_name << " to file: " << output_file_name << " with height: " << height << " and width: " << width << endl;
+			cout << "Generating chart from file: " << input_file_name << " to file: " << output_file_name <<
+				" with height: " << height << " and width: " << width << endl;
 			const long int size = read_csv_to_struct(stock_data_list, input_file_name);
 			generate_chart(stock_data_list, size, height, width);
 			generate_chart_to_file(stock_data_list, size, height, width, output_file_name);
@@ -152,7 +157,8 @@ long int read_line_numbers(ifstream& file)
 	long int line_count = 0;
 	// Read the file line by line
 	string line;
-	while (getline(file, line)) {
+	while (getline(file, line))
+	{
 		++line_count;
 	}
 
@@ -174,7 +180,8 @@ long int read_csv_to_struct(stock_data*& data, const string& file_name)
 	getline(file, header);
 
 	// Read the file line by line
-	for (int count = 0; count < line_count; ++count) {
+	for (int count = 0; count < line_count; ++count)
+	{
 		string line;
 		getline(file, line);
 		istringstream iss(line);
@@ -185,7 +192,8 @@ long int read_csv_to_struct(stock_data*& data, const string& file_name)
 			getline(iss, line, ',') && (istringstream(line) >> data[count].high) &&
 			getline(iss, line, ',') && (istringstream(line) >> data[count].low) &&
 			getline(iss, line, ',') && (istringstream(line) >> data[count].close) &&
-			getline(iss, line, ',') && (istringstream(line) >> data[count].volume)) {
+			getline(iss, line, ',') && (istringstream(line) >> data[count].volume))
+		{
 		}
 	}
 
@@ -195,7 +203,7 @@ long int read_csv_to_struct(stock_data*& data, const string& file_name)
 	return line_count;
 }
 
-double get_max(const stock_data* stock_data_list, long int size, int records)
+double get_max(const stock_data* stock_data_list, const long int size, const int records)
 {
 	double max = 0; // Initialize max to negative infinity
 	for (int i = size - records; i < size; i++)
@@ -208,12 +216,12 @@ double get_max(const stock_data* stock_data_list, long int size, int records)
 	return max;
 }
 
-double get_min(const stock_data* stock_data_list, long int size, int records)
+double get_min(const stock_data* stock_data_list, const long int size, const int records)
 {
 	double min = 1000000; // Initialize min to positive infinity
 	for (int i = size - records; i < size; i++)
 	{
-		if (stock_data_list[i].low < min and stock_data_list[i].low>0)
+		if (stock_data_list[i].low < min and stock_data_list[i].low > 0)
 		{
 			min = stock_data_list[i].low;
 		}
@@ -221,103 +229,136 @@ double get_min(const stock_data* stock_data_list, long int size, int records)
 	return min;
 }
 
-void generate_chart(const stock_data* stock_data_list, long int size, int height, int records) {
+void generate_chart(const stock_data* stock_data_list, const long int size, const int height, const int records)
+{
 	const double max = get_max(stock_data_list, size, records);
 	const double min = get_min(stock_data_list, size, records);
 	const double scale = (max - min) / height;
 
 	cout << setw(8) << "Value" << "^" << endl;
 	cout << setw(8) << max << "|" << endl;
-	for (int i = 0; i < height; i++) {
+	for (int i = 0; i < height; i++)
+	{
 		cout << setw(7) << ' ' << " | ";
-		for (int j = size - records; j < size; j++) {
+		for (int j = size - records; j < size; j++)
+		{
 			const double point = max - scale / 2 - scale * i;
 
-			if (point >= stock_data_list[j].low && point <= stock_data_list[j].high) {
-				if (point > stock_data_list[j].open && point > stock_data_list[j].close) {
+			if (point >= stock_data_list[j].low && point <= stock_data_list[j].high)
+			{
+				if (point > stock_data_list[j].open && point > stock_data_list[j].close)
+				{
 					cout << "|";
 				}
-				else if (point < stock_data_list[j].open && point < stock_data_list[j].close) {
+				else if (point < stock_data_list[j].open && point < stock_data_list[j].close)
+				{
 					cout << "|";
 				}
-				else if (stock_data_list[j].close > stock_data_list[j].open) {
+				else if (stock_data_list[j].close > stock_data_list[j].open)
+				{
 					cout << "O";
 				}
-				else if (stock_data_list[j].close < stock_data_list[j].open) {
+				else if (stock_data_list[j].close < stock_data_list[j].open)
+				{
 					cout << "#";
 				}
 			}
-			else {
+			else
+			{
 				cout << " ";
 			}
 		}
 		cout << endl;
 	}
 	cout << setw(7) << min << " | " << endl;
-	cout<< setw(8) <<" ";
+	cout << setw(8) << " ";
 	for (int i = 0; i <= records; i++)
 	{
-		cout  << "-";
+		cout << "-";
 	}
-	cout << ">" <<"  "<<"Day number"<< endl;
-	cout << setw(8) << ' '<<size-records<<setw(records)<<size;
-
+	cout << ">" << "  " << "Day number" << endl;
+	cout << setw(8) << ' ' << size - records << setw(records) << size<<endl;
 }
 
-void generate_chart_to_file(const stock_data* stock_data_list, long int size, int height, int records, const string& filename) {
+void generate_chart_to_file(const stock_data* stock_data_list, const long int size, const int height, const int records, const string& filename)
+{
 	const double max = get_max(stock_data_list, size, records);
 	const double min = get_min(stock_data_list, size, records);
 	const double scale = (max - min) / height;
 
-	ofstream outputFile(filename); // Open the output file stream
+	ofstream output_file(filename); // Open the output file stream
 
-	if (!outputFile.is_open()) {
+	if (!output_file.is_open())
+	{
 		cerr << "Error opening file: " << filename << endl;
 
 		// Try to create the file
-		ofstream createFile(filename);
+		ofstream create_file(filename);
 
-		if (createFile.is_open()) {
+		if (create_file.is_open())
+		{
 			cerr << "File created successfully: " << filename << endl;
-			createFile.close();
+			create_file.close();
 		}
-		else {
+		else
+		{
 			cerr << "Error creating file: " << filename << endl;
 			return;
 		}
 
 		// Try opening the file again
-		outputFile.open(filename);
-		if (!outputFile.is_open()) {
+		output_file.open(filename);
+		if (!output_file.is_open())
+		{
 			cerr << "Error opening file: " << filename << endl;
 			return;
 		}
 	}
 
-	for (int i = 0; i < height; i++) {
-		for (int j = size - records; j < size; j++) {
+	output_file << setw(8) << "Value" << "^" << endl;
+	output_file << setw(8) << max << "|" << endl;
+
+	for (int i = 0; i < height; i++)
+	{
+		output_file << setw(7) << ' ' << " | ";
+		for (int j = size - records; j < size; j++)
+		{
 			const double point = max - scale / 2 - scale * i;
 
-			if (point >= stock_data_list[j].low && point <= stock_data_list[j].high) {
-				if (point > stock_data_list[j].open && point > stock_data_list[j].close) {
-					outputFile << "|";
+			if (point >= stock_data_list[j].low && point <= stock_data_list[j].high)
+			{
+				if (point > stock_data_list[j].open && point > stock_data_list[j].close)
+				{
+					output_file << "|";
 				}
-				else if (point < stock_data_list[j].open && point < stock_data_list[j].close) {
-					outputFile << "|";
+				else if (point < stock_data_list[j].open && point < stock_data_list[j].close)
+				{
+					output_file << "|";
 				}
-				else if (stock_data_list[j].close > stock_data_list[j].open) {
-					outputFile << "O";
+				else if (stock_data_list[j].close > stock_data_list[j].open)
+				{
+					output_file << "O";
 				}
-				else if (stock_data_list[j].close < stock_data_list[j].open) {
-					outputFile << "#";
+				else if (stock_data_list[j].close < stock_data_list[j].open)
+				{
+					output_file << "#";
 				}
 			}
-			else {
-				outputFile << " ";
+			else
+			{
+				output_file << " ";
 			}
 		}
-		outputFile << endl;
+		output_file << endl;
 	}
+	output_file << setw(7) << min << " | " << endl;
+	output_file << setw(8) << " ";
+	for (int i = 0; i <= records; i++)
+	{
+		output_file << "-";
+	}
+	output_file << ">" << "  " << "Day number" << endl;
+	output_file << setw(8) << ' ' << size - records << setw(records) << size<<endl;
 
-	outputFile.close(); // Close the output file stream
+	output_file.close(); // Close the output file stream
 }
