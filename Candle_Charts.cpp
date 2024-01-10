@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 #include <sstream>
 
 using namespace std;
@@ -114,11 +115,11 @@ void menu(stock_data* stock_data_list)
 			cout << "Enter desired width: ";
 			cin >> width;
 			clear_screen();
-			cout<< "Generating chart from file: " << input_file_name << " to file: " << output_file_name << " with height: " << height << " and width: " << width << endl;
+			cout << "Generating chart from file: " << input_file_name << " to file: " << output_file_name << " with height: " << height << " and width: " << width << endl;
 			const long int size = read_csv_to_struct(stock_data_list, input_file_name);
 			generate_chart(stock_data_list, size, height, width);
 			generate_chart_to_file(stock_data_list, size, height, width, output_file_name);
-			
+
 			exit_program(stock_data_list);
 		}
 	}
@@ -225,7 +226,10 @@ void generate_chart(const stock_data* stock_data_list, long int size, int height
 	const double min = get_min(stock_data_list, size, records);
 	const double scale = (max - min) / height;
 
+	cout << setw(8) << "Value" << "^" << endl;
+	cout << setw(8) << max << "|" << endl;
 	for (int i = 0; i < height; i++) {
+		cout << setw(7) << ' ' << " | ";
 		for (int j = size - records; j < size; j++) {
 			const double point = max - scale / 2 - scale * i;
 
@@ -249,11 +253,20 @@ void generate_chart(const stock_data* stock_data_list, long int size, int height
 		}
 		cout << endl;
 	}
+	cout << setw(7) << min << " | " << endl;
+	cout<< setw(8) <<" ";
+	for (int i = 0; i <= records; i++)
+	{
+		cout  << "-";
+	}
+	cout << ">" <<"  "<<"Day number"<< endl;
+	cout << setw(8) << ' '<<size-records<<setw(records)<<size;
+
 }
 
 void generate_chart_to_file(const stock_data* stock_data_list, long int size, int height, int records, const string& filename) {
-	const double max = get_max(stock_data_list, size,records);
-	const double min = get_min(stock_data_list, size,records);
+	const double max = get_max(stock_data_list, size, records);
+	const double min = get_min(stock_data_list, size, records);
 	const double scale = (max - min) / height;
 
 	ofstream outputFile(filename); // Open the output file stream
