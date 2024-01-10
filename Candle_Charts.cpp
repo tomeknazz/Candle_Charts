@@ -119,8 +119,7 @@ void menu(stock_data* stock_data_list)
 			cout << "Enter desired width: ";
 			cin >> width;
 			clear_screen();
-			cout << "Generating chart from file: " << input_file_name << " to file: " << output_file_name <<
-				" with height: " << height << " and width: " << width << endl;
+			cout << "Generating chart from file: " << input_file_name << " to file: " << output_file_name << " with height: " << height << " and width: " << width << endl;
 			const long int size = read_csv_to_struct(stock_data_list, input_file_name);
 			generate_chart(stock_data_list, size, height, width);
 			generate_chart_to_file(stock_data_list, size, height, width, output_file_name);
@@ -158,9 +157,7 @@ long int read_line_numbers(ifstream& file)
 	// Read the file line by line
 	string line;
 	while (getline(file, line))
-	{
 		++line_count;
-	}
 
 	// Reset the file position
 	file.clear();
@@ -192,8 +189,7 @@ long int read_csv_to_struct(stock_data*& data, const string& file_name)
 			getline(iss, line, ',') && (istringstream(line) >> data[count].high) &&
 			getline(iss, line, ',') && (istringstream(line) >> data[count].low) &&
 			getline(iss, line, ',') && (istringstream(line) >> data[count].close) &&
-			getline(iss, line, ',') && (istringstream(line) >> data[count].volume))
-		{
+			getline(iss, line, ',') && (istringstream(line) >> data[count].volume)) {
 		}
 	}
 
@@ -207,25 +203,17 @@ double get_max(const stock_data* stock_data_list, const long int size, const int
 {
 	double max = 0; // Initialize max to negative infinity
 	for (int i = size - records; i < size; i++)
-	{
 		if (stock_data_list[i].high > max)
-		{
 			max = stock_data_list[i].high;
-		}
-	}
 	return max;
 }
 
 double get_min(const stock_data* stock_data_list, const long int size, const int records)
 {
-	double min = 1000000; // Initialize min to positive infinity
+	double min = 1000000000000000; // Initialize min to positive infinity
 	for (int i = size - records; i < size; i++)
-	{
 		if (stock_data_list[i].low < min and stock_data_list[i].low > 0)
-		{
 			min = stock_data_list[i].low;
-		}
-	}
 	return min;
 }
 
@@ -246,38 +234,26 @@ void generate_chart(const stock_data* stock_data_list, const long int size, cons
 
 			if (point >= stock_data_list[j].low && point <= stock_data_list[j].high)
 			{
-				if (point > stock_data_list[j].open && point > stock_data_list[j].close)
-				{
+				if ((point > stock_data_list[j].open && point > stock_data_list[j].close) || (point < stock_data_list[j].open && point < stock_data_list[j].close))
 					cout << "|";
-				}
-				else if (point < stock_data_list[j].open && point < stock_data_list[j].close)
-				{
-					cout << "|";
-				}
 				else if (stock_data_list[j].close > stock_data_list[j].open)
-				{
 					cout << "O";
-				}
 				else if (stock_data_list[j].close < stock_data_list[j].open)
-				{
 					cout << "#";
-				}
 			}
 			else
-			{
 				cout << " ";
-			}
 		}
 		cout << endl;
 	}
 	cout << setw(7) << min << " | " << endl;
 	cout << setw(8) << " ";
+
 	for (int i = 0; i <= records; i++)
-	{
 		cout << "-";
-	}
+
 	cout << ">" << "  " << "Day number" << endl;
-	cout << setw(8) << ' ' << size - records << setw(records) << size<<endl;
+	cout << setw(8) << ' ' << size - records << setw(records) << size << endl;
 }
 
 void generate_chart_to_file(const stock_data* stock_data_list, const long int size, const int height, const int records, const string& filename)
@@ -327,11 +303,7 @@ void generate_chart_to_file(const stock_data* stock_data_list, const long int si
 
 			if (point >= stock_data_list[j].low && point <= stock_data_list[j].high)
 			{
-				if (point > stock_data_list[j].open && point > stock_data_list[j].close)
-				{
-					output_file << "|";
-				}
-				else if (point < stock_data_list[j].open && point < stock_data_list[j].close)
+				if ((point > stock_data_list[j].open && point > stock_data_list[j].close) || (point < stock_data_list[j].open && point < stock_data_list[j].close))
 				{
 					output_file << "|";
 				}
@@ -358,7 +330,7 @@ void generate_chart_to_file(const stock_data* stock_data_list, const long int si
 		output_file << "-";
 	}
 	output_file << ">" << "  " << "Day number" << endl;
-	output_file << setw(8) << ' ' << size - records << setw(records) << size<<endl;
+	output_file << setw(8) << ' ' << size - records << setw(records) << size << endl;
 
 	output_file.close(); // Close the output file stream
 }
