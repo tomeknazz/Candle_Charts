@@ -292,11 +292,14 @@ void generate_chart_to_file(const stock_data* stock_data_list, const long int si
 	}
 
 	output_file << setw(8) << "Value" << "^" << endl;
-	output_file << setw(8) << max << "|" << endl;
+	output_file << setw(8) << ' ' << "|" << endl;
 
 	for (int i = 0; i < height; i++)
 	{
-		output_file << setw(7) << ' ' << " | ";
+		if (i % 10 == 0)
+			output_file << setw(7) << max - scale * i << " | ";
+		else
+			output_file << setw(7) << ' ' << " | ";
 		for (int j = size - records; j < size; j++)
 		{
 			const double point = max - scale / 2 - scale * i;
@@ -330,7 +333,16 @@ void generate_chart_to_file(const stock_data* stock_data_list, const long int si
 		output_file << "-";
 	}
 	output_file << ">" << "  " << "Day number" << endl;
-	output_file << setw(8) << ' ' << size - records << setw(records) << size << endl;
+	output_file << setw(8) << ' ';
+	for (int i = 0; i <= records; i++)
+	{
+		if(i%25==0)
+			output_file << size-records+i;
+		else
+			if(!i%3==0)
+				output_file << ' ';
+	}
+	//output_file << setw(8) << ' ' << size - records << setw(records) << size << endl;
 
 	output_file.close(); // Close the output file stream
 }
